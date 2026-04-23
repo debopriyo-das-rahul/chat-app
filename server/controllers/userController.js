@@ -3,6 +3,15 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
 
+
+const safeUser = (user) => ({
+  _id: user._id,
+  fullName: user.fullName,
+  email: user.email,
+  profilePic: user.profilePic,
+  bio: user.bio,
+});
+
 // Signup a new user
 export const signup = async (req, res) => {
   const { fullName, email, password, bio } = req.body;
@@ -35,7 +44,7 @@ export const signup = async (req, res) => {
     const token = generateToken(newUser._id);
     res.json({
       success: true,
-      userData: newUser,
+      userData: safeUser(newUser),
       token,
       message: "Account created successfully",
     });
@@ -71,7 +80,7 @@ export const login = async (req, res) => {
     const token = generateToken(userData._id);
     res.json({
       success: true,
-      userData,
+      userData: safeUser(userData),
       token,
       message: "Login successful",
     });
@@ -88,7 +97,7 @@ export const login = async (req, res) => {
 export const checkAuth = (req, res) => {
   res.json({
     success: true,
-    user: req.user,
+    user: safeUser(req.user),
   });
 };
 
@@ -115,7 +124,7 @@ export const updateProfile = async (req, res) => {
     }
     res.json({
       success: true,
-      user: updatedUser,
+      user: safeUser(updatedUser),
     });
   } catch (error) {
     console.log(error.message);
